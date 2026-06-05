@@ -279,17 +279,15 @@ a{text-decoration-thickness:1px!important;text-underline-offset:.1em}:where(.wp-
 		<div class="entry-content alignfull wp-block-post-content has-global-padding is-layout-constrained wp-block-post-content-is-layout-constrained">
 <script>
     const CONFIG_CURA_RADIO = {
-        // 1. Link direto do seu arquivo de 804MB hospedado no Dropbox
+        // Mantemos o raw=1 para o servidor entregar o arquivo bruto em tempo real
         audioUrl: "https://dl.dropboxusercontent.com/scl/fi/26ib3ujo4r6jwvq7lu1xr/post-drain-by-tchly.mp3?rlkey=49fd2u5k0mmmetta2imql4ibs&st=vhkk77pd&raw=1",
-        
-        // 2. Título da transmissão atual
-        tituloSet: "c0501: post drain by tchly"
+        tituloSet: "c05/02: rádio cura by ohaind"
     };
 </script>
 
 <div class="cura-player-container">
-    
-    <audio id="cura-audio-track"></audio>
+    <!-- CORREÇÃO 1: Adicionado preload="auto" para forçar o navegador a carregar o áudio em background assim que a página abrir -->
+    <audio id="cura-audio-track" preload="auto" crossorigin="anonymous"></audio>
 
     <div class="cura-player-controls">
         <button id="cura-play-btn" class="cura-control-button">▶︎</button>
@@ -387,10 +385,6 @@ a{text-decoration-thickness:1px!important;text-underline-offset:.1em}:where(.wp-
     background-color: #FF0000;
     transition: width 0.1s linear;
 }
-
-.cura-player-container:hover .cura-progress-fill {
-    background-color: #FF0000;
-}
 </style>
 
 <script>
@@ -402,7 +396,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const statusText = document.getElementById('cura-track-status');
     const titleText = document.getElementById('cura-set-title');
 
+    // CORREÇÃO 2: Força o link a ser injetado imediatamente para iniciar o buffering invisível
     audio.src = CONFIG_CURA_RADIO.audioUrl;
+    audio.load(); // Força o gatilho de carregamento inicial
+    
     titleText.innerText = CONFIG_CURA_RADIO.tituloSet;
 
     const iconPlay = '\u25B6\uFE0E';  
@@ -410,10 +407,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function togglePlay() {
         if (audio.paused) {
-            audio.play();
-            playBtn.innerHTML = iconPause;
-            statusText.innerText = 'online';
-            statusText.style.color = '#a0a0a0';
+            // CORREÇÃO 3: Garante que o play seja executado de forma assíncrona imediata
+            statusText.innerText = 'carregando...';
+            
+            audio.play().then(() => {
+                playBtn.innerHTML = iconPause;
+                statusText.innerText = 'online';
+                statusText.style.color = '#a0a0a0';
+            }).catch(err => {
+                console.log("Erro ao reproduzir:", err);
+                statusText.innerText = 'erro';
+            });
         } else {
             audio.pause();
             playBtn.innerHTML = iconPlay;
@@ -425,8 +429,10 @@ document.addEventListener("DOMContentLoaded", function() {
     playBtn.addEventListener('click', togglePlay);
 
     audio.addEventListener('timeupdate', () => {
-        const percentage = (audio.currentTime / audio.duration) * 100;
-        progress.style.width = percentage + '%';
+        if (audio.duration) {
+            const percentage = (audio.currentTime / audio.duration) * 100;
+            progress.style.width = percentage + '%';
+        }
     });
 
     audio.addEventListener('ended', () => {
@@ -439,7 +445,9 @@ document.addEventListener("DOMContentLoaded", function() {
         const rect = progressContainer.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const clickedPercentage = x / rect.width;
-        audio.currentTime = clickedPercentage * audio.duration;
+        if (audio.duration) {
+            audio.currentTime = clickedPercentage * audio.duration;
+        }
     });
 });
 </script>
@@ -488,7 +496,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-<p class="wp-block-paragraph">“Sempre fui louco por filmes independentes e estética. Acho que a minha bagagem visual é muito influenciada pelo cinema e pelos blogs do <em>Tumblr</em> com os quais me deparei quando vagava pela internet muito novo. Se esse set fosse a trilha sonora de um filme, seria do <em>Stanley Kubrick</em>, e eu tenho certeza de que a paleta de cores seria azul.”</p>
+<p class="wp-block-paragraph">“Sempre fui louco por filmes independentes e estética. Acho que a minha bagagem visual é muito influenciada pelo cinema e pelos blogs do <em>Tumblr</em> com os quais me deparei quando vagava pela internet muito novo. Se esse set fosse a trilha sonora de um filme, seria do <em>Stanley Kubrick</em>, e eu tenho certeza de que a paleta de cores seria <em>azul</em>.”</p>
 
 
 
@@ -504,7 +512,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-<p class="wp-block-paragraph">“Desde 2019, quando comecei a produzir, essa vertente faz a minha cabeça. É um movimento derivado do coletivo <em>Drain Gang (GTBSG)</em>, filiado à <em>Sad Boys</em> do Yung Lean, que se enraizou profundamente no SoundCloud após a ascensão do grupo. É um ecossistema que mistura melodias ambientes, etéreas e introspectivas, com a energia bruta das baterias de trap e letras extremamente emocionais. É com esse contexto e com essa essência que quero continuar guiando os meus próximos projetos.”</p>
+<p class="wp-block-paragraph">“Desde 2019, quando comecei a produzir, essa vertente faz a minha cabeça. É um movimento derivado do coletivo <em>Drain Gang (GTBSG)</em>, filiado à <em>Sad Boys</em>, do Yung Lean, que se enraizou profundamente no <em>SoundCloud</em> após a ascensão do grupo. É um ecossistema que mistura melodias ambientes, etéreas e introspectivas, com a energia bruta das baterias de trap e letras extremamente emocionais. É com esse contexto e com essa essência que quero continuar guiando os meus próximos projetos.”</p>
 
 
 
@@ -516,7 +524,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 <div class="wp-block-column is-vertically-aligned-bottom is-layout-flow wp-block-column-is-layout-flow">
-<p class="has-text-align-left wp-block-paragraph">CORES by Cura, dísponivel no Instagram.</p>
+<p class="has-text-align-left wp-block-paragraph">CORES by Cura, disponível no Instagram.</p>
 </div>
 
 
